@@ -16,7 +16,7 @@ kite = KiteConnect(api_key=api_key)
 data = kite.generate_session(request_token=request_token, api_secret=api_secret)
 
 config.set('login_details', 'access_token',data["access_token"])
-print("access token is-> ",data["access_token"]," save this one for future use.")
+#print("access token is-> ",data["access_token"]," save this one for future use.")
 
 with open(config_file_path, 'w') as configfile:
     config.write(configfile)

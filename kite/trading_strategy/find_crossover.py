@@ -1,19 +1,18 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from kite.util import generate_file as create_file, generate_kite as gen_kite, date, send_email as email
-from datetime import datetime
 
 # Initialize values
 no_of_data=9
 instrument_token=256265 #256265=NIFTY 50
-from_date=datetime.strptime("2023-08-10", "%Y-%m-%d")
-to_date=datetime.strptime("2023-08-23", "%Y-%m-%d")
+from_date=date.get_delta_india_time(1)
+to_date=date.get_current_india_time()
 interval="15minute"
 continuous=False
 oi=False
 
 custom_col_1 = "Sma_9"
-decision_maker = "" #1st item= type, 2nd item= buy/sell
+decision_maker = ""
 custom_col_1_value=0
 stop_loss=0
 trade_entry_price=0
@@ -82,7 +81,7 @@ def check_stop_loss(date_index,closing_price):
 def main():
 
     kite=gen_kite.generate_instance()
-    current_india_time=date.get_current_india_time()
+    current_india_time=to_date
 
     historical_data=kite.historical_data( instrument_token, from_date, to_date, interval, continuous, oi)
     current_data=kite.ltp("NSE:NIFTY 50")
@@ -101,6 +100,7 @@ def main():
     len_crossover=len(crossovers)
 
     # Stop loss value, mark both decision and column name=""
+    #add logger
 
     if len_crossover == 1:
         crossover = crossovers[0]

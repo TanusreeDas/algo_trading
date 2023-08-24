@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from kite.util import generate_file as create_file, generate_kite as gen_kite, date
+from kite.util import generate_file as create_file, generate_kite as gen_kite, date, send_email as email
 from datetime import datetime
 
 # Initialize values
@@ -13,35 +13,30 @@ continuous=False
 oi=False
 
 custom_col_1 = "Sma_9"
-decision_maker = {"Column_name":"","Decision":""} #1st item= type, 2nd item= buy/sell
+decision_maker = "" #1st item= type, 2nd item= buy/sell
 custom_col_1_value=0
 stop_loss=0
 trade_entry_price=0
 
 def find_crossovers(dates,closing_prices):
     global custom_col_1_value
-    # Calculate the SMA9
+    # Calculate the SMA9 for last two points
     custom_col_1_value = closing_prices.rolling(int(custom_col_1[4:])).mean()
 
     # Check for crossovers to take the buy and sell decision
     crossover = []
-    i=len(closing_prices)-1
 
-    old_closing_price= closing_prices.values[i-1]
-    new_closing_price = closing_prices.values[i]
-    old_sma= custom_col_1_value.values[i-1]
-    new_sma= custom_col_1_value.values[i]
-
-
-    print("OLD Closing Price= ", old_closing_price)
-    print("NEW closing Price= ", new_closing_price )
-    print("OLD SMA9= ", old_sma)
-    print("NEW SMA9= ", new_sma)
+    old_closing_price= closing_prices.values[no_of_data-1]
+    new_closing_price = closing_prices.values[no_of_data]
+    old_date= dates.values[no_of_data-1]
+    new_date=dates.values[no_of_data]
+    old_sma= custom_col_1_value.values[no_of_data-1]
+    new_sma= custom_col_1_value.values[no_of_data]
 
     if old_closing_price > old_sma and new_closing_price < new_sma:#Price crosses above SMA9 (crossover from below)
-        crossover.append((dates.values[i], closing_prices[i], 'Buy '+custom_col_1))
+        crossover.append((old_date, new_date, old_closing_price, new_closing_price, old_sma,new_sma,'Buy'))
     elif old_closing_price < old_sma and new_closing_price > new_sma:#Price crosses below SMA9 (crossover from above)
-        crossover.append((dates.values.index[i], closing_prices[i], 'Sell '+custom_col_1))
+        crossover.append((old_date, new_date, old_closing_price, new_closing_price, old_sma,new_sma,'Sell'))
 
     return crossover
 
@@ -55,31 +50,15 @@ def plot_crossovers(dates,closing_prices,crossover):
 
     #One Buy and Sell at al time
     #need to complete this logic tommorrow
-    if crossover[2][0:1] == 'B':
-        if  decision_maker["Decision"]=="" and decision_maker["Column_name"]=="":
-            plt.scatter(crossover[0], crossover[1], marker='o', color='green') #Single Buy
-            decision_maker["Column_name"] = crossover[2].split(' ')[1]
-            decision_maker["Decision"] = "Sell"
-            trade_entry_price=crossover[1]
+    if crossover[5] == 'Buy'and decision_maker in ("","Buy"):
+            plt.scatter(crossover[1], crossover[3], marker='o', color='green') #Single Buy
+            decision_maker = "Sell"
+            trade_entry_price=crossover[3]
             stop_loss = trade_entry_price - 50
-        elif decision_maker["Decision"] == "Buy" and decision_maker["Column_name"] == crossover[2].split(' ')[1]:
-            plt.scatter(crossover[0], crossover[1], marker='s', color='green') #Double Buy
-            decision_maker["Column_name"] = crossover[2].split(' ')[1]
-            decision_maker["Decision"] = "Sell"
-            trade_entry_price = crossover[1]
-            stop_loss = trade_entry_price - 50
-    elif crossover[2][0:1] == 'S':
-        if decision_maker["Decision"] == "" and decision_maker["Column_name"] == "":
-            plt.scatter(crossover[0], crossover[1], marker='o', color='red')  # Single Buy
-            decision_maker["Column_name"] = crossover[2].split(' ')[1]
-            decision_maker["Decision"] = "Buy"
-            trade_entry_price = crossover[1]
-            stop_loss = trade_entry_price + 50
-        elif decision_maker["Decision"] == "Buy" and decision_maker["Column_name"] == crossover[2].split(' ')[1]:
-            plt.scatter(crossover[0], crossover[1], marker='s', color='red')  # Double Buy
-            decision_maker["Column_name"] = crossover[2].split(' ')[1]
-            decision_maker["Decision"] = "Buy"
-            trade_entry_price = crossover[1]
+    elif crossover[5] == 'Sell' and decision_maker in ( "", "Sell") :
+            plt.scatter(crossover[1], crossover[3], marker='o', color='red')  # Single Buy
+            decision_maker = "Buy"
+            trade_entry_price = crossover[3]
             stop_loss = trade_entry_price + 50
 
     plt.xlabel('Date')
@@ -91,12 +70,11 @@ def plot_crossovers(dates,closing_prices,crossover):
 def check_stop_loss(date_index,closing_price):
     global trade_entry_price,stop_loss,decision_maker
     if closing_price < stop_loss:
-        if decision_maker["Decision"] == "Buy":
+        if decision_maker == "Buy":
             plt.scatter(date_index, closing_price, marker='x', color='darkgreen')
-        elif decision_maker["Decision"] == "Sell":
+        elif decision_maker == "Sell":
             plt.scatter(date_index, closing_price, marker='x', color='maroon')
-        decision_maker["Column_name"] = ""
-        decision_maker["Decision"] = ""
+        decision_maker = ""
         trade_entry_price = 0
         stop_loss=0
 
@@ -112,18 +90,33 @@ def main():
     #merge two files
     latest_data = [(dict1['date'], dict1['close']) for dict1 in historical_data[-no_of_data:]]
     latest_data.append((current_india_time, current_data['NSE:NIFTY 50']['last_price']))
-    latest_data_df=pd.DataFrame(latest_data)
+    latest_data_df=pd.DataFrame(latest_data,columns=['date','close'])
 
-    create_file.generate_csv_file("converted_data",latest_data_df,['date','close'])
+    dates=latest_data_df['date']
+    closing_prices=latest_data_df['close']
 
-    '''crossovers = find_crossovers(dates, closing_prices)
+    #create_file.generate_csv_file("converted_data",latest_data_df,['date','close'])
+
+    crossovers = find_crossovers(dates,closing_prices)
+    len_crossover=len(crossovers)
 
     # Stop loss value, mark both decision and column name=""
 
-    if len(crossovers) > 0:
-        plot_crossovers(dates, closing_prices, crossovers)
-    check_stop_loss(historical_data_df.iloc[-1, 0], closing_prices.iloc[-1])'''
-
+    if len_crossover == 1:
+        crossover = crossovers[0]
+        plot_crossovers(dates, closing_prices, crossover)
+        gmail_message = f"At {crossover[1]} time we found one crossover for {crossover[3]} closing price. \n\n" \
+                        f" More details-> \n 1. Previous time= {crossover[0]},\n 2. Current time= {crossover[1]}," \
+                        f"\n 3. Previous closing price= {crossover[2]},\n 4. Latest closing price= {crossover[3]}," \
+                        f"\n 5. Previous SMA9= {crossover[4]},\n 6. Latest SMA9= {crossover[5]},\n 7. Decision for this Trade= {crossover[6]}.\n" \
+                        f"Take necessary action if you think the decision is wrong. \n\n\n Thanks and Regards,\n TradingMantra"
+        email.send_gmail(subject="AlgoTrading - New Crossover ALERT!!",message=gmail_message)
+    elif len_crossover>1:
+        gmail_message = f"Multiple Crossover Generated, Fix the problem ASAP!! Details-> First two messages are {crossovers[0]} " \
+                        f"and {crossovers[1]}. There could be more. Please check"
+        email.send_gmail(subject="Bug in Crossover Logic!!", message=gmail_message)
+    check_stop_loss(current_india_time, current_data['NSE:NIFTY 50']['last_price'])
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()

@@ -1,13 +1,9 @@
 import schedule
 import time
-from ..trading_strategy import find_crossover as fc
+from kite.trading_strategy import find_crossover as fc
 
-def run_program():
-    # Your code here
-    fc.main()
-
-# Schedule the program to run every 1 minute
-schedule.every(1).minutes.do(run_program)
+def schedule_job():
+    schedule.every(1).minutes.do(fc.main())
 
 while True:
     schedule.run_pending()

@@ -6,7 +6,7 @@ To install and run this application, ensure that you have Python version 3.5 or 
 
 1. Create a directory named kite/config and place the following files inside it:
 
-    + env file: This file should contain your email and other configuration details.
+    + .env file: This file should contain your email and other configuration details.
     + config_file.ini file: This file is required to generate an access code that expires every 24 hours.
 2. Create a directory named kite/data/csv if you want to generate CSV files to manually check data. This directory can be kept empty.
 

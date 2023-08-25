@@ -1,2 +1,4 @@
 # Manually ignored files
 kite/config/.env
+kite/config/config_file.ini
+kite/data/*

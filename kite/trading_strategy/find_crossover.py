@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from kite.util import generate_file as create_file, generate_kite as gen_kite, date, send_email as email, logger
+import time
 
 # Initialize values
 log = logger.setup_logger("dev_log.log")
@@ -26,15 +27,15 @@ def find_crossovers(dates,closing_prices):
     # Calculate the SMA9 for last two points
     custom_col_1_value = closing_prices.rolling(int(custom_col_1[4:])).mean()
 
-    # Check for crossovers to take the buy and sell decision
     crossover = []
-
     old_closing_price= closing_prices.values[no_of_data-1]
     new_closing_price = closing_prices.values[no_of_data]
     old_date= dates.values[no_of_data-1]
     new_date=dates.values[no_of_data]
     old_sma= custom_col_1_value.values[no_of_data-1]
     new_sma= custom_col_1_value.values[no_of_data]
+    log.info(f"Processing for Previous Closing Price= {old_closing_price}, Current Closing Price= "
+             f"{new_closing_price}, Previous SMA9= {old_sma}, New SMA9= {new_sma} on {new_date}")
 
     if old_closing_price > old_sma and new_closing_price <= new_sma:#Price crosses above SMA9 (crossover from below)
         crossover.append((old_date, new_date, old_closing_price, new_closing_price, old_sma,new_sma,'Sell'))
@@ -49,10 +50,9 @@ def plot_crossovers(dates,closing_prices,crossover):
     plt.plot(dates, closing_prices, label='Closing Price')
     plt.plot(dates, custom_col_1_value, label=custom_col_1)
 
-    print(decision_maker.values())
+    log.info(f"decision maker in plot_crossover is= {decision_maker}")
 
     #One Buy and Sell at al time
-    #need to complete this logic tommorrow
     if crossover[5] == 'Buy'and decision_maker in ("","Buy"):
             plt.scatter(crossover[1], crossover[3], marker='o', color='green') #Single Buy
             decision_maker = "Sell"
@@ -72,6 +72,7 @@ def plot_crossovers(dates,closing_prices,crossover):
 
 def check_stop_loss(date_index,closing_price):
     global trade_entry_price,stop_loss_level,decision_maker
+
     if closing_price < stop_loss_level:
         if decision_maker == "Buy":
             plt.scatter(date_index, closing_price, marker='x', color='darkgreen')
@@ -116,8 +117,10 @@ def main():
 
         if len_crossover == 1:
             log.info("Only one crossover found. So plotting it.")
+
             crossover = crossovers[0]
             plot_crossovers(dates, closing_prices, crossover)
+
             log.info("crossover plotted. ")
             gmail_message = f"At {crossover[1]} time we found one crossover for {crossover[3]} closing price. \n\n" \
                             f" More details-> \n 1. Previous time= {crossover[0]},\n 2. Current time= {crossover[1]}," \
@@ -126,19 +129,26 @@ def main():
                             f"Take necessary action if you think the decision is wrong. \n\n\n Thanks and Regards,\n TradingMantra"
             email.send_gmail(subject="AlgoTrading - New Crossover ALERT!!",message=gmail_message)
             log.info("Gmail sent for ",crossover[3]," closing value")
+
         elif len_crossover>1:
             log.error(f"more than one crossover found-> {crossovers}")
             gmail_message = f"Multiple Crossover Generated, Fix the problem ASAP!! Details-> First two messages are {crossovers[0]} " \
                             f"and {crossovers[1]}. There could be more. Please check. \n\n\n Thanks and Regards,\n TradingMantra"
             email.send_gmail(subject="Bug in Crossover Logic!!", message=gmail_message)
             log.warning("Sent mail for multiple crossover.")
+
         check_stop_loss(current_india_time, current_data['NSE:NIFTY 50']['last_price'])
         log.info("Stop loss check is done.")
+
     except Exception as e:
         log.exception("An error occurred: %s", e)
-        log.error(f"This is a generic Exception block. Exception details-> {e}")
+        log.error(f"This is a generic Exception block")
+    except KeyboardInterrupt as e:
+        log.exception("User Forcefully stopped execution: %s", e)
+        log.error(f"Forcefully program is closed")
 
 if __name__ == "__main__":
     log.info("Running as standalone program.")
     while True:
         main()
+        time.sleep(14.6*60)

@@ -4,22 +4,23 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-load_dotenv('../config/.env')
+load_dotenv("../config/.env")
 
 # Access environment variables
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_CLIENT = os.getenv('EMAIL_CLIENT')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_CLIENT = os.getenv("EMAIL_CLIENT")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-def send_gmail(subject,message):
+
+def send_gmail(subject, message):
     # Create a MIME message
     msg = MIMEMultipart()
-    msg['From'] = EMAIL_HOST_USER
-    msg['To'] = EMAIL_CLIENT
-    msg['Subject'] = subject
-    msg.attach(MIMEText(message, 'plain'))
+    msg["From"] = EMAIL_HOST_USER
+    msg["To"] = EMAIL_CLIENT
+    msg["Subject"] = subject
+    msg.attach(MIMEText(message, "plain"))
 
     # Connect to SMTP server and send email
     try:
@@ -34,7 +35,8 @@ def send_gmail(subject,message):
 
 
 def main():
-    send_gmail("AlgoTrading - New Crossover ALERT!!","We found a new crossover.")
+    send_gmail("AlgoTrading - New Crossover ALERT!!", "We found a new crossover.")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()

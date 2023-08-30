@@ -13,9 +13,7 @@ config.read(config_file_path)
 
 # Initialize values
 log = logger.setup_logger(config.get("trading_setup_attributes", "log_name"))
-trading_symbol = logger.setup_logger(
-    config.get("trading_setup_attributes", "trading_symbol")
-)
+trading_symbol = config.get("trading_setup_attributes", "trading_symbol")
 no_of_data = int(
     config.get("trading_setup_attributes", "no_of_historical_data_to_fetch")
 )

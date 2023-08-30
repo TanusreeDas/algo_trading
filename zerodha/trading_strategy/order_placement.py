@@ -54,7 +54,7 @@ def update_profit_margin_and_stop_loss(ltp):
         )
 
     log.info(
-        f"Dynamic Target profit level and Stop Loss values has changed. 1. Trade_entry_price = "
+        f"Trailing Target profit level and Stop Loss levels have been modified. 1. Trade_entry_price = "
         f"{global_variables.trade_entry_price}, 2. Current_LTP = {ltp}, 3. Current_trade_type = "
         f"{existing_trade_type}, 4. Old_stop_loss_level = {current_stop_loss_level}, 5. "
         f"Updated_stop_loss_level = {global_variables.stop_loss_level}, 6. Old_target_profit_level = "

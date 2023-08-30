@@ -3,7 +3,6 @@ from zerodha.util import send_email as email
 
 
 def find_crossovers(dates, closing_prices):
-
     no_of_data = global_variables.no_of_data
     custom_col_1_value = closing_prices.rolling(
         int(global_variables.custom_col_1[4:])

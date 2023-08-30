@@ -20,14 +20,14 @@ def send_mail_after_placing_order(crossover, order_id):
     )
 
 
-def book_order(order_type,quantity):
+def book_order(order_type, quantity):
     kite = global_variables.kite
 
     transaction_type = (
         kite.TRANSACTION_TYPE_BUY if order_type == "Buy" else kite.TRANSACTION_TYPE_SELL
     )
 
-    '''order_id = kite.place_order(
+    """order_id = kite.place_order(
         variety=kite.VARIETY_REGULAR,
         tradingsymbol=global_variables.trading_symbol,
         exchange=kite.EXCHANGE_NSE,
@@ -36,11 +36,15 @@ def book_order(order_type,quantity):
         order_type=kite.ORDER_TYPE_MARKET,
         product=kite.PRODUCT_CNC,
         validity=kite.VALIDITY_DAY,
-    )'''
-    global_variables.order_id=global_variables.order_id+1 #these two lines needs to be removed when
-    order_id=global_variables.order_id  #we will place real order
+    )"""
+    global_variables.order_id = (
+        global_variables.order_id + 1
+    )  # these two lines needs to be removed when
+    order_id = global_variables.order_id  # we will place real order
 
-    global_variables.log.info(f'{quantity} order/s placed for "{order_id}" order id and transaction_type = {transaction_type}.')
+    global_variables.log.info(
+        f'{quantity} order/s placed for "{order_id}" order id and transaction_type = {transaction_type}.'
+    )
 
     return order_id
 
@@ -52,11 +56,10 @@ def place_order(crossover):
 
     # One Buy and Sell at al time
     if crossover[6] == "Buy" and global_variables.decision_maker in ("", "Buy"):
-
         if global_variables.decision_maker == "":
-            order_id = book_order(crossover[6],1)
-        else :
-            order_id = book_order(crossover[6],2)
+            order_id = book_order(crossover[6], 1)
+        else:
+            order_id = book_order(crossover[6], 2)
 
         send_mail_after_placing_order(crossover, order_id)
 
@@ -70,7 +73,6 @@ def place_order(crossover):
         )
 
     elif crossover[6] == "Sell" and global_variables.decision_maker in ("", "Sell"):
-
         if global_variables.decision_maker == "":
             order_id = book_order(crossover[6], 1)
         else:

@@ -8,7 +8,7 @@ log = global_variables.log
 def update_profit_margin_and_stop_loss(ltp):
     current_stop_loss_level = global_variables.stop_loss_level
     current_target_profit_level = global_variables.target_profit_level
-    stpt_threshold=global_variables.stpt_threshold
+    stpt_threshold = global_variables.stpt_threshold
 
     if global_variables.decision_maker == "Buy":
         stpt_multiple = (global_variables.trade_entry_price - ltp) // stpt_threshold
@@ -156,8 +156,8 @@ def check_target_profit(closing_price):
 
 def check_profit_margin_and_stop_loss(closing_price):
     target_profit_order_id = check_target_profit(closing_price)
-    stop_loss_order_id=0
+    stop_loss_order_id = 0
     if target_profit_order_id == 0:
         stop_loss_order_id = check_stop_loss(closing_price)
-    if stop_loss_order_id==0 and target_profit_order_id == 0:
+    if stop_loss_order_id == 0 and target_profit_order_id == 0:
         update_profit_margin_and_stop_loss(closing_price)

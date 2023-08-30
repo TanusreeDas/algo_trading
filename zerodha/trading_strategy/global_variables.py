@@ -29,14 +29,13 @@ custom_col_1 = config.get("trading_setup_attributes", "cross_over_logic")
 trailing_stop_loss = int(config.get("trading_setup_attributes", "stop_loss"))
 trailing_profit_target = int(config.get("trading_setup_attributes", "profit_target"))
 days_ago = int(config.get("trading_setup_attributes", "days_ago"))
-stpt_threshold =int(config.get("trading_setup_attributes","stpt_threshold"))
+stpt_threshold = int(config.get("trading_setup_attributes", "stpt_threshold"))
 
 from_date = date.get_delta_india_time(days_ago)
-to_date = date.get_current_india_time()
 
 decision_maker = ""
 trade_entry_price = 0
 stop_loss_level = 0
 target_profit_level = 0
 
-order_id = 555 #need to delete this when we want to place real order
+order_id = 555  # need to delete this when we want to place real order

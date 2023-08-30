@@ -27,3 +27,9 @@ def get_delta_india_time(days):
     parsed_time = parser.parse(india_time_string)
 
     return parsed_time
+
+
+def get_current_day():
+    parsed_india_time = get_current_india_time()
+    dd_mm_yyyy = parsed_india_time.strftime("%d-%m-%Y")
+    return dd_mm_yyyy

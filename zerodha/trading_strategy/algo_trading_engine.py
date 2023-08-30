@@ -5,10 +5,11 @@ import order_placement
 import risk_management
 import eod_tasks
 import global_variables
+from zerodha.util import date
 
 kite = global_variables.kite
 log = global_variables.log
-to_date = global_variables.to_date
+to_date = date.get_current_india_time()
 
 
 def find_latest_data():

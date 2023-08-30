@@ -10,7 +10,7 @@ def get_current_india_time():
     current_india_time = current_time_utc.astimezone(india_time_zone)
     india_time_string = current_india_time.strftime(
         "%Y-%m-%d %H:%M:%S %z"
-    )  # to keep the date format same as kite history data
+    )  # to keep the date format same as zerodha history data
     parsed_india_time = parser.parse(india_time_string)
 
     return parsed_india_time
@@ -23,7 +23,7 @@ def get_delta_india_time(days):
     delta_india_time = delta_time_utc.astimezone(india_time_zone)
     india_time_string = delta_india_time.strftime(
         "%Y-%m-%d %H:%M:%S %z"
-    )  # to keep the date format same as kite history data
+    )  # to keep the date format same as zerodha history data
     parsed_time = parser.parse(india_time_string)
 
     return parsed_time

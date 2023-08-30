@@ -1,11 +1,11 @@
 from kiteconnect import KiteConnect
-from kite.util import logger
+from zerodha.util import logger
 import os
 import configparser
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 config_file_path = os.path.join(current_dir, "..", "config", "config_file.ini")
-log = logger.setup_logger("dev_log.log")
+log = logger.setup_logger("access_token_log.log")
 config = configparser.ConfigParser()
 
 # Read and Access configuration values

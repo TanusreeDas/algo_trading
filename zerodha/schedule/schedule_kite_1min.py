@@ -1,6 +1,6 @@
 import schedule
 import time
-from kite.trading_strategy import find_crossover as fc
+from zerodha.trading_strategy import algo_trading_engine as fc
 
 
 def schedule_job():

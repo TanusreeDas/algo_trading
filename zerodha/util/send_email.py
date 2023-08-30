@@ -14,7 +14,7 @@ EMAIL_CLIENT = os.getenv("EMAIL_CLIENT")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 
-def send_gmail(subject, message):
+def send_gmail(log, subject, message):
     # Create a MIME message
     msg = MIMEMultipart()
     msg["From"] = EMAIL_HOST_USER
@@ -29,14 +29,12 @@ def send_gmail(subject, message):
         smtp_server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
         smtp_server.sendmail(EMAIL_HOST_USER, EMAIL_CLIENT, msg.as_string())
         smtp_server.quit()
-        print("Email sent successfully!")
+        log.debug("send_gmail() method executed successfully.")
+        print(
+            "Email sent successfully!"
+        )  # added only to view the message in console,can be deleted.
     except Exception as e:
-        print("Error:", str(e))
-
-
-def main():
-    send_gmail("AlgoTrading - New Crossover ALERT!!", "We found a new crossover.")
-
-
-if __name__ == "__main__":
-    main()
+        log.exception(
+            f"An error occurred while sending email from send_email.send_gmail(): %s", e
+        )
+        log.error("This is a generic Exception block in send_email.send_gmail()")

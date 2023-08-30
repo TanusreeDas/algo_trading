@@ -50,8 +50,10 @@ def book_order(order_type, quantity):
 
 
 def place_order(crossover):
-    global_variables.log.debug(
-        f"In Place_Order function-> 1. Decision maker= {global_variables.decision_maker}, 2. Crossover Decision= {crossover[6]}"
+    global_variables.log.info(
+        f"Before executing Place_Order old values are, 1. Decision maker= {global_variables.decision_maker}, "
+        f"2. Crossover Decision= {crossover[6]}, 3. Trade Entry Price= {global_variables.trade_entry_price}, "
+        f"4.Stop Loss Level= {global_variables.stop_loss_level}, 5. Target profit Loss= {global_variables.target_profit_level}"
     )
 
     # One Buy and Sell at al time
@@ -65,12 +67,6 @@ def place_order(crossover):
 
         global_variables.decision_maker = "Sell"
         global_variables.trade_entry_price = crossover[3]
-        global_variables.stop_loss_level = (
-            global_variables.trade_entry_price - global_variables.trailing_stop_loss
-        )
-        global_variables.target_profit_level = (
-            global_variables.trade_entry_price + global_variables.trailing_profit_target
-        )
 
     elif crossover[6] == "Sell" and global_variables.decision_maker in ("", "Sell"):
         if global_variables.decision_maker == "":
@@ -82,14 +78,9 @@ def place_order(crossover):
 
         global_variables.decision_maker = "Buy"
         global_variables.trade_entry_price = crossover[3]
-        global_variables.stop_loss_level = (
-            global_variables.trade_entry_price + global_variables.trailing_stop_loss
-        )
-        global_variables.target_profit_level = (
-            global_variables.trade_entry_price - global_variables.trailing_profit_target
-        )
 
     global_variables.log.info(
-        f"After executing Place_Order new values are, 1. Decision maker= {global_variables.decision_maker}, 2. "
-        f"Trade Entry Price= {global_variables.trade_entry_price}, 3.Stop Loss Level= {global_variables.stop_loss_level}"
+        f"After executing Place_Order new values are, 1. Decision maker= {global_variables.decision_maker}, "
+        f"2. Trade Entry Price= {global_variables.trade_entry_price}, 3.Stop Loss Level= "
+        f"{global_variables.stop_loss_level}, 4. Target profit Loss= {global_variables.target_profit_level}"
     )

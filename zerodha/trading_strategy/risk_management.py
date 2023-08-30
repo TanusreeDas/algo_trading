@@ -9,6 +9,7 @@ def update_profit_margin_and_stop_loss(ltp):
     current_stop_loss_level = global_variables.stop_loss_level
     current_target_profit_level = global_variables.target_profit_level
     stpt_threshold = global_variables.stpt_threshold
+    existing_trade_type = "Buy" if global_variables.decision_maker == "Sell" else "Sell"
 
     if global_variables.decision_maker == "Buy":
         stpt_multiple = (global_variables.trade_entry_price - ltp) // stpt_threshold
@@ -36,11 +37,11 @@ def update_profit_margin_and_stop_loss(ltp):
         )
 
     log.info(
-        f"Dynamically Target profit level and Stop Loss values has changed. 1. Trade_entry_price = "
-        f"{global_variables.trade_entry_price}, 2. Current_LTP = {ltp}, 3. Previous_trade_type = "
-        f"{global_variables.decision_maker}, 4. Old_stop_loss_level = {current_stop_loss_level}, 5. "
-        f"Old_target_profit_level = {current_target_profit_level}, 6. Current_stop_loss_level = "
-        f"{global_variables.stop_loss_level}, 7. Current_target_profit_level = {global_variables.target_profit_level}."
+        f"Dynamic Target profit level and Stop Loss values has changed. 1. Trade_entry_price = "
+        f"{global_variables.trade_entry_price}, 2. Current_LTP = {ltp}, 3. Current_trade_type = "
+        f"{existing_trade_type}, 4. Old_stop_loss_level = {current_stop_loss_level}, 5. "
+        f"Updated_stop_loss_level = {global_variables.stop_loss_level}, 6. Old_target_profit_level = "
+        f"{current_target_profit_level}, 7. Current_target_profit_level = {global_variables.target_profit_level}."
     )
 
 
@@ -101,8 +102,6 @@ def send_target_profit_email(closing_price):
 
 
 def check_stop_loss(closing_price):
-    order_id = 0
-
     if (
         closing_price > global_variables.stop_loss_level
         and global_variables.decision_maker == "Buy"
@@ -123,13 +122,14 @@ def check_stop_loss(closing_price):
         )
         order_id = order_placement.book_order("Sell", 1)
         send_stop_loss_email(closing_price)
+    else:
+        order_id = 0
+        log.debug("Stop loss level is not breached.")
 
     return order_id
 
 
 def check_target_profit(closing_price):
-    order_id = 0
-
     if (
         closing_price < global_variables.target_profit_level
         and global_variables.decision_maker == "Buy"
@@ -150,6 +150,9 @@ def check_target_profit(closing_price):
         )
         order_id = order_placement.book_order("Sell", 1)
         send_target_profit_email(closing_price)
+    else:
+        order_id = 0
+        log.debug("Target profit level is not breached.")
 
     return order_id
 

@@ -31,6 +31,7 @@ stpt_threshold = int(config.get("trading_setup_attributes", "stpt_threshold"))
 
 from_date = date.get_delta_india_time(days_ago)
 
+cross_over_order_placed = False
 decision_maker = ""
 trade_entry_price = 0
 stop_loss_level = 0

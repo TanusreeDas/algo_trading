@@ -5,46 +5,6 @@ from zerodha.util import send_email as email
 log = global_variables.log
 
 
-def update_profit_margin_and_stop_loss(ltp):
-    current_stop_loss_level = global_variables.stop_loss_level
-    current_target_profit_level = global_variables.target_profit_level
-    stpt_threshold = global_variables.stpt_threshold
-    existing_trade_type = "Buy" if global_variables.decision_maker == "Sell" else "Sell"
-
-    if global_variables.decision_maker == "Buy":
-        stpt_multiple = (global_variables.trade_entry_price - ltp) // stpt_threshold
-        global_variables.stop_loss_level = (
-            global_variables.trade_entry_price
-            + global_variables.trailing_stop_loss
-            - stpt_multiple * stpt_threshold
-        )
-        global_variables.target_profit_level = (
-            global_variables.trade_entry_price
-            - global_variables.trailing_profit_target
-            - stpt_multiple * stpt_threshold
-        )
-    elif global_variables.decision_maker == "Sell":
-        stpt_multiple = (ltp - global_variables.trade_entry_price) // stpt_threshold
-        global_variables.stop_loss_level = (
-            global_variables.trade_entry_price
-            - global_variables.trailing_stop_loss
-            + stpt_multiple * stpt_threshold
-        )
-        global_variables.target_profit_level = (
-            global_variables.trade_entry_price
-            + global_variables.trailing_profit_target
-            + stpt_multiple * 25
-        )
-
-    log.info(
-        f"Dynamic Target profit level and Stop Loss values has changed. 1. Trade_entry_price = "
-        f"{global_variables.trade_entry_price}, 2. Current_LTP = {ltp}, 3. Current_trade_type = "
-        f"{existing_trade_type}, 4. Old_stop_loss_level = {current_stop_loss_level}, 5. "
-        f"Updated_stop_loss_level = {global_variables.stop_loss_level}, 6. Old_target_profit_level = "
-        f"{current_target_profit_level}, 7. Current_target_profit_level = {global_variables.target_profit_level}."
-    )
-
-
 def send_stop_loss_email(closing_price):
     gmail_message = (
         f"StopLoss level breached. Check the below data and please take immediate action incase"
@@ -163,4 +123,4 @@ def check_profit_margin_and_stop_loss(closing_price):
     if target_profit_order_id == 0:
         stop_loss_order_id = check_stop_loss(closing_price)
     if stop_loss_order_id == 0 and target_profit_order_id == 0:
-        update_profit_margin_and_stop_loss(closing_price)
+        order_placement.update_profit_margin_and_stop_loss(closing_price)

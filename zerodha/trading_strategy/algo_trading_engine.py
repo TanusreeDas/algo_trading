@@ -55,10 +55,14 @@ def execute_trading_strategy():
         else:
             log.debug("No crossover found.")
 
-        if global_variables.decision_maker != "":
+        if (
+            global_variables.decision_maker != ""
+            and not global_variables.cross_over_order_placed
+        ):
             latest_closing_price = closing_prices.iloc[-1]
             risk_management.check_profit_margin_and_stop_loss(latest_closing_price)
             log.debug("Stop loss and Profit Target checks are done.")
+        global_variables.cross_over_order_placed = False
 
     except Exception as e:
         log.exception("An error occurred: %s", e)

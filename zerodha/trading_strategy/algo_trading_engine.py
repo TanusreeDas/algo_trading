@@ -9,16 +9,15 @@ from zerodha.util import date
 
 kite = global_variables.kite
 log = global_variables.log
-to_date = date.get_current_india_time()
 
 
 def find_latest_data():
-    current_india_time = to_date
+    current_india_time = date.get_current_india_time()
 
     historical_data = kite.historical_data(
         global_variables.instrument_token,
         global_variables.from_date,
-        to_date,
+        current_india_time,
         global_variables.interval,
         global_variables.continuous,
         global_variables.oi,
@@ -32,13 +31,16 @@ def find_latest_data():
     latest_data.append((current_india_time, current_data))
     latest_data_df = pd.DataFrame(latest_data, columns=["date", "close"])
 
-    return [latest_data_df["date"], latest_data_df["close"]]
+    return latest_data_df
 
 
 def execute_trading_strategy():
     try:
-        dates, closing_prices = find_latest_data()[0], find_latest_data()[1]
-        crossovers = crossover_detection.find_crossovers(dates, closing_prices)
+        latest_ltp_data = find_latest_data()
+        dates, closing_prices = latest_ltp_data["date"], latest_ltp_data["close"]
+        crossovers = crossover_detection.find_crossovers(
+            dates.astype(str), closing_prices
+        )
         len_crossover = len(crossovers)
 
         if len_crossover == 1:
@@ -75,7 +77,7 @@ def execute_trading_strategy():
 def main(caller_desc):
     log.debug(f"Running as a {caller_desc} program.")
     while True:
-        current_time = to_date
+        current_time = date.get_current_india_time()
         market_closing_time = current_time.replace(
             hour=15, minute=30, second=0, microsecond=0
         )

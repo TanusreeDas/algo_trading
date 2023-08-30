@@ -11,8 +11,8 @@ def find_crossovers(dates, closing_prices):
     crossover = []
     old_closing_price = closing_prices.values[no_of_data - 1]
     new_closing_price = closing_prices.values[no_of_data]
-    old_date = dates.values[no_of_data - 1]
-    new_date = dates.values[no_of_data]
+    old_date = dates[no_of_data - 1]
+    new_date = dates[no_of_data]
     old_sma = custom_col_1_value.values[no_of_data - 1]
     new_sma = custom_col_1_value.values[no_of_data]
     global_variables.log.info(

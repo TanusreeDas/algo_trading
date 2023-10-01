@@ -5,21 +5,30 @@ log = global_variables.log
 
 
 def send_mail_after_placing_order(crossover, order_id):
-    gmail_message = (
-        f"At {crossover[1]} time we placed one {crossover[6]} order for {crossover[3]} closing price. \n\n"
-        f" More details-> \n 1. Order Id = {order_id},\n 2. Decision for this Trade= {crossover[6]},\n 8. "
-        f"Decision for previous trade= {global_variables.decision_maker}. \n Take necessary action if you think the decision "
-        f"is wrong. \n\n\n Thanks and Regards,\n TradingMantra"
-    )
+    if crossover:
+        gmail_message = (
+            f"At {crossover[1]} time we placed one {crossover[6]} order for {crossover[3]} closing price. \n\n"
+            f" More details-> \n 1. Order Id = {order_id},\n 2. Decision for this Trade = {crossover[6]},\n 3. "
+            f"Decision for previous trade= {global_variables.decision_maker}. \n Take necessary action if you "
+            f"think the decision is wrong. \n\n\n Thanks and Regards,\n TradingMantra"
+        )
+    else:
+        gmail_message = (
+            f"EOD closing all open trades. Currently one trade was open so closed it by placing one "
+            f"complementary trade. \n\n 1. Order Id = {order_id}, \n 2. Decision for this Trade = 'Buy' if "
+            f"{global_variables.decision_maker} == 'Sell' else 'Sell',\n 3. Decision for previous trade= "
+            f"{global_variables.decision_maker}. \n Take necessary action if you think the decision is wrong."
+            f" \n\n\n Thanks and Regards,\n TradingMantra"
+        )
     email.send_gmail(
         log=log,
         subject=f"AlgoTrading - New Order - {order_id} Placed ALERT!!",
         message=gmail_message,
     )
-
-    log.info(
-        f"Order Gmail is sent after {crossover[6]}ing a new trade for {crossover[3]} closing price."
-    )
+    if crossover:
+        log.info(
+            f"Order Gmail is sent after {crossover[6]}ing a new trade for {crossover[3]} closing price."
+        )
 
 
 def update_profit_margin_and_stop_loss(ltp):

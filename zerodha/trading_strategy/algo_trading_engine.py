@@ -22,22 +22,19 @@ def find_latest_data():
         global_variables.continuous,
         global_variables.oi,
     )
-    current_data = kite.ltp("NSE:NIFTY 50")["NSE:NIFTY 50"]["last_price"]
 
     latest_data = [
         (dict1["date"], dict1["close"])
         for dict1 in historical_data[-global_variables.no_of_data :]
     ]
-    latest_data.append((current_india_time, current_data))
     latest_data_df = pd.DataFrame(latest_data, columns=["date", "close"])
 
-    return latest_data_df
+    return latest_data_df["date"], latest_data_df["close"]
 
 
 def execute_trading_strategy():
     try:
-        latest_ltp_data = find_latest_data()
-        dates, closing_prices = latest_ltp_data["date"], latest_ltp_data["close"]
+        dates, closing_prices = find_latest_data()
         crossovers = crossover_detection.find_crossovers(
             dates.astype(str), closing_prices
         )

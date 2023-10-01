@@ -9,15 +9,16 @@ def find_crossovers(dates, closing_prices):
     ).mean()
 
     crossover = []
-    old_closing_price = closing_prices.values[no_of_data - 1]
-    new_closing_price = closing_prices.values[no_of_data]
-    old_date = dates[no_of_data - 1]
-    new_date = dates[no_of_data]
-    old_sma = custom_col_1_value.values[no_of_data - 1]
-    new_sma = custom_col_1_value.values[no_of_data]
+    old_closing_price = closing_prices.values[no_of_data - 2]
+    new_closing_price = closing_prices.values[no_of_data - 1]
+    old_date = dates[no_of_data - 2]
+    new_date = dates[no_of_data - 1]
+    old_sma = custom_col_1_value.values[no_of_data - 2]
+    new_sma = custom_col_1_value.values[no_of_data - 1]
     global_variables.log.info(
-        f"Processing for-> 1. Previous Closing Price= {old_closing_price}, 2.Current Closing Price= "
-        f"{new_closing_price}, 3.Previous SMA9= {old_sma}, 4.New SMA9= {new_sma} on {new_date}"
+        f"Processing for-> 1. Previous timestamp= {old_date}, 2. Current timestamp= {new_date}, "
+        f"3. Previous Closing Price= {old_closing_price}, 4.Current Closing Price= "
+        f"{new_closing_price}, 5.Previous SMA9= {old_sma}, 6.New SMA9= {new_sma}."
     )
 
     if old_closing_price > old_sma and new_closing_price <= new_sma:

@@ -1,3 +1,4 @@
 # Manually ignored files
 zerodha/config/*
 zerodha/data/*
+zerodha/old_files/*

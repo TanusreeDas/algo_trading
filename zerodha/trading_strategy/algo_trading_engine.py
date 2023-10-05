@@ -86,6 +86,7 @@ def main(caller_desc):
         execute_trading_strategy()
         log.warning("Now Program will take 5 minutes Pause..")
         time.sleep(5 * 60)
+    log.info(f"{caller_desc} process completed.")
 
 
 if __name__ == "__main__":

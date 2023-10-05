@@ -5,20 +5,28 @@ log = global_variables.log
 
 
 def send_mail_after_placing_order(crossover, order_id):
+    current_order_decision = global_variables.decision_maker
+    if current_order_decision == "":
+        previous_order_decision = "None as it is the first trade of the day"
+    elif current_order_decision == "Sell":
+        previous_order_decision = "Buy"
+    else:
+        previous_order_decision = "Sell"
+
     if crossover:
         gmail_message = (
             f"At {crossover[1]} time we placed one {crossover[6]} order for {crossover[3]} closing price. \n\n"
             f" More details-> \n 1. Order Id = {order_id},\n 2. Decision for this Trade = {crossover[6]},\n 3. "
-            f"Decision for previous trade= {global_variables.decision_maker}. \n Take necessary action if you "
+            f"Decision for previous trade= {previous_order_decision}. \n Take necessary action if you "
             f"think the decision is wrong. \n\n\n Thanks and Regards,\n TradingMantra"
         )
     else:
         gmail_message = (
             f"EOD closing all open trades. Currently one trade was open so closed it by placing one "
-            f"complementary trade. \n\n 1. Order Id = {order_id}, \n 2. Decision for this Trade = 'Buy' if "
-            f"{global_variables.decision_maker} == 'Sell' else 'Sell',\n 3. Decision for previous trade= "
-            f"{global_variables.decision_maker}. \n Take necessary action if you think the decision is wrong."
-            f" \n\n\n Thanks and Regards,\n TradingMantra"
+            f"complementary trade. \n\n 1. Order Id = {order_id}, \n 2. Decision for this Trade = "
+            f"{current_order_decision},\n 3. Decision for previous trade= {previous_order_decision}."
+            f"\n Take necessary action if you think the decision is wrong. \n\n\n Thanks and Regards,"
+            f"\n TradingMantra"
         )
     email.send_gmail(
         log=log,
@@ -37,7 +45,7 @@ def update_profit_margin_and_stop_loss(ltp):
     stpt_threshold = global_variables.stpt_threshold
     existing_trade_type = "Buy" if global_variables.decision_maker == "Sell" else "Sell"
 
-    if global_variables.decision_maker == "Buy":
+    if existing_trade_type == "Sell":
         stpt_multiple = (global_variables.trade_entry_price - ltp) // stpt_threshold
         global_variables.stop_loss_level = (
             global_variables.trade_entry_price
@@ -49,7 +57,7 @@ def update_profit_margin_and_stop_loss(ltp):
             - global_variables.trailing_profit_target
             - stpt_multiple * stpt_threshold
         )
-    elif global_variables.decision_maker == "Sell":
+    elif existing_trade_type == "Buy":
         stpt_multiple = (ltp - global_variables.trade_entry_price) // stpt_threshold
         global_variables.stop_loss_level = (
             global_variables.trade_entry_price
@@ -95,7 +103,7 @@ def book_order(order_type, quantity):
     order_id = global_variables.order_id  # we will place real order
 
     log.info(
-        f'{quantity} order/s placed for "{order_id}" order id and transaction_type = {transaction_type}.'
+        f'{quantity} order(s) placed for "{order_id}" order id and transaction_type = {transaction_type}.'
     )
 
     return order_id

@@ -8,9 +8,9 @@ log = global_variables.log
 def send_stop_loss_email(closing_price):
     gmail_message = (
         f"StopLoss level breached. Check the below data and please take immediate action incase"
-        f" you find any discrepancy.\n 1. Closing price= {closing_price},\n 2. Stop Loss Level="
-        f" {global_variables.stop_loss_level},\n 3. Target Profit Level= {global_variables.target_profit_level}, \n 4. "
-        f"Decision on the Trade= {global_variables.decision_maker}.  \n\n\n Thanks and Regards,\n TradingMantra"
+        f" you find any discrepancy.<br> 1. Closing price= {closing_price},<br> 2. Stop Loss Level="
+        f" {global_variables.stop_loss_level},<br> 3. Target Profit Level= {global_variables.target_profit_level}, <br> 4. "
+        f"Decision on the Trade= {global_variables.decision_maker}.  <br><br><br> Thanks and Regards,<br> TradingMantra"
     )
     email.send_gmail(
         log=log, subject="Stop Loss Level Breached!!", message=gmail_message
@@ -36,9 +36,9 @@ def send_stop_loss_email(closing_price):
 def send_target_profit_email(closing_price):
     gmail_message = (
         f"Target Profit Level crossed. Check the below data and if you find any problem then take an "
-        f"immediate action on this.\n 1. Closing price= {closing_price},\n 2. target profit level= "
-        f"{global_variables.target_profit_level} and 3. Stop Loss Level= {global_variables.stop_loss_level},\n "
-        f"3. Decision on the Trade= {global_variables.decision_maker}.  \n\n\n Thanks and Regards,\n TradingMantra"
+        f"immediate action on this.<br> 1. Closing price= {closing_price},<br> 2. target profit level= "
+        f"{global_variables.target_profit_level} and 3. Stop Loss Level= {global_variables.stop_loss_level},<br> "
+        f"3. Decision on the Trade= {global_variables.decision_maker}.  <br> Thanks and Regards,<br> TradingMantra"
     )
     email.send_gmail(
         log=log, subject="Stop Loss Level Crossed!!", message=gmail_message

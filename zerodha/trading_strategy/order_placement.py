@@ -2,6 +2,7 @@ import global_variables
 from zerodha.util import send_email as email
 
 log = global_variables.log
+kite = global_variables.kite
 
 
 def send_mail_after_placing_order(crossover, order_id):
@@ -15,23 +16,27 @@ def send_mail_after_placing_order(crossover, order_id):
 
     if crossover:
         gmail_message = (
-            f"At {crossover[1]} time we placed one {crossover[6]} order for {crossover[3]} closing price. \n\n"
-            f" More details-> \n 1. Order Id = {order_id},\n 2. Decision for this Trade = {crossover[6]},\n 3. "
-            f"Decision for previous trade= {previous_order_decision}. \n Take necessary action if you "
-            f"think the decision is wrong. \n\n\n Thanks and Regards,\n TradingMantra"
+            f"At {crossover[1]} time we placed one {crossover[6]} order for {crossover[3]} closing price. <br><br>"
+            f" More details-> <br> 1. Order Id = {order_id},<br> 2. Decision for this Trade = {crossover[6]},<br> 3. "
+            f"Decision for previous trade= {previous_order_decision}. <br> Take necessary action if you "
+            f"think the decision is wrong. <br><br><br> Thanks and Regards,<br> TradingMantra"
         )
     else:
+        current_closing_price = kite.ltp("NSE:NIFTY 50")["NSE:NIFTY 50"]["last_price"]
+
         gmail_message = (
-            f"EOD closing all open trades. Currently one trade was open so closed it by placing one "
-            f"complementary trade. \n\n 1. Order Id = {order_id}, \n 2. Decision for this Trade = "
-            f"{current_order_decision},\n 3. Decision for previous trade= {previous_order_decision}."
-            f"\n Take necessary action if you think the decision is wrong. \n\n\n Thanks and Regards,"
-            f"\n TradingMantra"
+            f"EOD closing all open trades. Currently one trade was open so closed it by placing one complementary trade "
+            f"for {current_closing_price} closing price. <br><br> 1. Order Id = {order_id},<br> 2. Decision for this Trade = "
+            f"{current_order_decision},<br> 3. Decision for previous trade= {previous_order_decision}. <br> Take necessary "
+            f"action if you think the decision is wrong. <br><br><br> Thanks and Regards,<br> TradingMantra"
         )
+
+    disclaimer = "<b>Disclaimer:</b> Please note that closing prices may slightly vary due to the timing of order placement."
+    full_gmail_message = gmail_message + "<br><br>" + disclaimer
     email.send_gmail(
         log=log,
         subject=f"AlgoTrading - New Order - {order_id} Placed ALERT!!",
-        message=gmail_message,
+        message=full_gmail_message,
     )
     if crossover:
         log.info(

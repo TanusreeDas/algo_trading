@@ -20,7 +20,7 @@ def send_gmail(log, subject, message):
     msg["From"] = EMAIL_HOST_USER
     msg["To"] = EMAIL_CLIENT
     msg["Subject"] = subject
-    msg.attach(MIMEText(message, "plain"))
+    msg.attach(MIMEText(message, "html"))
 
     # Connect to SMTP server and send email
     try:

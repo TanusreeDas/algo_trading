@@ -9,13 +9,33 @@ kite = global_variables.kite
 def eod_send_email(order_id=""):
     if order_id != "":
         gmail_message = (
-            f"Market is Closed for the Day. We closed all open trades by placing a {global_variables.decision_maker} order."
-            f"New order id = {order_id}. Have a nice day. <br><br><br> Thanks and Regards,<br> TradingMantra"
+            f"""
+            Dear Client,<br><br>
+
+            We would like to inform you that the market has closed for the day. As part of our routine procedures, we have closed all open trades by placing a {global_variables.decision_maker} order. The new order ID is {order_id}.<br><br>
+
+            We hope you had a successful trading day, and we look forward to assisting you in future trades.<br><br>
+
+            Thank you for choosing TradingMantra.<br><br>
+
+            Warm Regards,<br>
+            TradingMantra Support Team<br>
+            """
         )
     else:
         gmail_message = (
-            f"Market is Closed for the Day. We did not have any open trade. Have a "
-            f"nice day. <br><br><br> Thanks and Regards,<br> TradingMantra"
+            f"""
+            Dear Client,<br><br>
+    
+            We would like to inform you that the market has closed for the day. We are pleased to report that there were no open trades to manage at market close today.<br><br>
+    
+            We hope you had a successful day, and we look forward to assisting you in future trades.<br><br>
+    
+            Thank you for choosing TradingMantra.<br><br>
+    
+            Warm Regards,<br>
+            TradingMantra Support Team<br>
+            """
         )
     to_date = date.get_current_day()
     email.send_gmail(log=log, subject=f"EOD Mail- {to_date}", message=gmail_message)

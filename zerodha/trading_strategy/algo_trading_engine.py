@@ -45,7 +45,7 @@ def execute_trading_strategy():
             log.info(f"Only one crossover found. Crossover= {crossover}")
             crossover_detection.send_crossover_email(crossover)
 
-            order_placement.place_order(crossover)
+            order_placement.place_cross_over_order(crossover)
 
         elif len_crossover > 1:
             log.error(f"more than one crossover found-> {crossovers}")

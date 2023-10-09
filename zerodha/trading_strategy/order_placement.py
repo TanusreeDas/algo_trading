@@ -4,11 +4,51 @@ from zerodha.util import send_email as email
 log = global_variables.log
 kite = global_variables.kite
 
+def send_order_placement_email_stop_level_crossed(type, order_id):
+    current_order_decision = global_variables.decision_maker
+    if current_order_decision == "":
+        previous_order_decision = "None"
+    elif current_order_decision == "Sell":
+        previous_order_decision = "Buy"
+    else:
+        previous_order_decision = "Sell"
+
+    current_closing_price = kite.ltp("NSE:NIFTY 50")["NSE:NIFTY 50"]["last_price"]
+    gmail_message = (
+        f"""
+        Dear Client,<br><br>
+    
+        We are writing to inform you that a {type} breach has occurred in your trading account, involving a closing price of {current_closing_price}.<br><br>
+    
+        To address this situation, we have taken the following action:
+        <ol>
+            <li><b>Action:</b> Place a new trade order</li>
+            <li><b>Order Id:</b> {order_id}</li>
+            <li><b>Decision for this Trade:</b> {current_order_decision}</li>
+            <li><b>Decision for previous trade:</b> {previous_order_decision}</li>
+        </ol>
+
+        Your satisfaction and success in trading are our top priorities. If you have any questions or concerns about this decision, please feel free to reach out to us. We're here to assist you.<br><br>
+
+        Thank you for choosing TradingMantra.<br><br>
+
+        Warm Regards,<br>
+        TradingMantra Support Team<br>
+        """
+ )
+    disclaimer = "<b>Disclaimer:</b> Please note that closing prices may slightly vary due to the timing of order placement."
+    full_gmail_message = gmail_message + "<br><br>" + disclaimer
+    email.send_gmail(
+        log=log,
+        subject=f"AlgoTrading - New Order - {order_id} Placed ALERT!!",
+        message=full_gmail_message,
+    )
+
 
 def send_mail_after_placing_order(crossover, order_id):
     current_order_decision = global_variables.decision_maker
     if current_order_decision == "":
-        previous_order_decision = "None as it is the first trade of the day"
+        previous_order_decision = "None"
     elif current_order_decision == "Sell":
         previous_order_decision = "Buy"
     else:
@@ -16,19 +56,49 @@ def send_mail_after_placing_order(crossover, order_id):
 
     if crossover:
         gmail_message = (
-            f"At {crossover[1]} time we placed one {crossover[6]} order for {crossover[3]} closing price. <br><br>"
-            f" More details-> <br> 1. Order Id = {order_id},<br> 2. Decision for this Trade = {crossover[6]},<br> 3. "
-            f"Decision for previous trade= {previous_order_decision}. <br> Take necessary action if you "
-            f"think the decision is wrong. <br><br><br> Thanks and Regards,<br> TradingMantra"
+            f"""
+            Dear Client,<br><br>
+
+            At {crossover[1]}, we took action to optimize your trading account. We placed a {crossover[6]} order for a closing price of {crossover[3]}.<br><br>
+
+            Here are the details:
+            <ol>
+                <li><b>Order Id:</b> {order_id}</li>
+                <li><b>Decision for this Trade:</b> {crossover[6]}</li>
+                <li><b>Decision for previous trade:</b> {previous_order_decision}</li>
+            </ol>
+            
+            Your satisfaction and success in trading are our top priorities. If you have any questions or concerns about this decision, please feel free to reach out to us. We're here to assist you.<br><br>
+
+            Thank you for choosing TradingMantra.<br><br>
+
+            Warm Regards,<br>
+            TradingMantra Support Team<br>
+            """
         )
     else:
         current_closing_price = kite.ltp("NSE:NIFTY 50")["NSE:NIFTY 50"]["last_price"]
 
         gmail_message = (
-            f"EOD closing all open trades. Currently one trade was open so closed it by placing one complementary trade "
-            f"for {current_closing_price} closing price. <br><br> 1. Order Id = {order_id},<br> 2. Decision for this Trade = "
-            f"{current_order_decision},<br> 3. Decision for previous trade= {previous_order_decision}. <br> Take necessary "
-            f"action if you think the decision is wrong. <br><br><br> Thanks and Regards,<br> TradingMantra"
+            f"""
+            Dear Client,<br><br>
+
+            At the end of the trading day, we have closed all open trades as part of our standard procedure. Currently, one trade was open, and we have taken action by placing a complementary trade for a closing price of {current_closing_price}.<br><br>
+
+            Here are the details:
+            <ol>
+                <li><b>Order Id:</b> {order_id}</li>
+                <li><b>Decision for this Trade:</b> {current_order_decision}</li>
+                <li><b>Decision for previous trade:</b> {previous_order_decision}</li>
+            </ol>
+
+            If you have any questions or concerns regarding this action, please don't hesitate to contact us. We value your peace of mind and are here to provide any assistance you may need.<br><br>
+
+            Thank you for choosing TradingMantra.<br><br>
+            
+            Warm Regards,<br>
+            TradingMantra Support Team<br>
+            """
         )
 
     disclaimer = "<b>Disclaimer:</b> Please note that closing prices may slightly vary due to the timing of order placement."
@@ -50,7 +120,7 @@ def update_profit_margin_and_stop_loss(ltp):
     stpt_threshold = global_variables.stpt_threshold
     existing_trade_type = "Buy" if global_variables.decision_maker == "Sell" else "Sell"
 
-    if existing_trade_type == "Sell":
+    if existing_trade_type == "Buy":
         stpt_multiple = (global_variables.trade_entry_price - ltp) // stpt_threshold
         global_variables.stop_loss_level = (
             global_variables.trade_entry_price
@@ -62,7 +132,7 @@ def update_profit_margin_and_stop_loss(ltp):
             - global_variables.trailing_profit_target
             - stpt_multiple * stpt_threshold
         )
-    elif existing_trade_type == "Buy":
+    elif existing_trade_type == "Sell":
         stpt_multiple = (ltp - global_variables.trade_entry_price) // stpt_threshold
         global_variables.stop_loss_level = (
             global_variables.trade_entry_price
@@ -114,9 +184,9 @@ def book_order(order_type, quantity):
     return order_id
 
 
-def place_order(crossover):
+def place_cross_over_order(crossover):
     log.info(
-        f"Before executing Place_Order old values are, 1. Decision maker= {global_variables.decision_maker}, "
+        f"Before executing place_cross_over_order old values are, 1. Decision maker= {global_variables.decision_maker}, "
         f"2. Crossover Decision= {crossover[6]}, 3. Trade Entry Price= {global_variables.trade_entry_price}, "
         f"4.Stop Loss Level= {global_variables.stop_loss_level}, 5. Target profit Loss= {global_variables.target_profit_level}"
     )
@@ -128,10 +198,10 @@ def place_order(crossover):
         else:
             order_id = book_order(crossover[6], 2)
 
+        global_variables.trade_entry_price = crossover[3]
         send_mail_after_placing_order(crossover, order_id)
 
         global_variables.decision_maker = "Sell"
-        global_variables.trade_entry_price = crossover[3]
         update_profit_margin_and_stop_loss(crossover[3])
 
     elif crossover[6] == "Sell" and global_variables.decision_maker in ("", "Sell"):
@@ -140,14 +210,14 @@ def place_order(crossover):
         else:
             order_id = book_order(crossover[6], 2)
 
+        global_variables.trade_entry_price = crossover[3]
         send_mail_after_placing_order(crossover, order_id)
 
         global_variables.decision_maker = "Buy"
-        global_variables.trade_entry_price = crossover[3]
         update_profit_margin_and_stop_loss(crossover[3])
 
     log.info(
-        f"After executing Place_Order new values are, 1. Decision maker= {global_variables.decision_maker}, "
+        f"After executing place_cross_over_order new values are, 1. Decision maker= {global_variables.decision_maker}, "
         f"2. Trade Entry Price= {global_variables.trade_entry_price}, 3.Stop Loss Level= "
         f"{global_variables.stop_loss_level}, 4. Target profit Loss= {global_variables.target_profit_level}"
     )
